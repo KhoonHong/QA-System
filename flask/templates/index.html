@@ -1,0 +1,119 @@
+{% include "sweetalerts.html" %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Q&A System</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+  <script src="https://kit.fontawesome.com/37bb299f2b.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='style.css') }}">
+</head>
+<body>
+  {% if answers %}
+  <style>
+    table, th, td {
+      font-family: arial, sans-serif;
+      border-collapse: collapse;
+      border: 1px solid black;
+      margin: 0 auto;
+    }
+
+    td, th {
+      text-align: justify;
+      min-width: 100px;
+    }
+    </style>
+    <script>
+      var answers = "{{ answers }}";
+      // split string by || as delimiter
+      answers = answers.split("||");
+      // remove empty string from list
+      answers = answers.filter(function (el) {
+        return el != "";
+      });
+      // replace &#39; with '
+      answers = answers.map(function (el) {
+        return el.replace(/&#39;/g, "'");
+      });
+      var dict_ans = {}
+      // loop through list and convert string to json, assume first value is key, second value is value
+      for (var i = 0; i < answers.length; i+=2) {
+        dict_ans[answers[i]] = answers[i+1];
+      }
+      answers = dict_ans;
+      // place answers into a html table
+      html_table = 
+      `<table>
+        <tr>
+          <th>Answer</th>
+          <th>Score</th>
+        </tr>`
+      for (const [key, value] of Object.entries(answers)) {
+        html_table += 
+        `<tr>
+          <td>${key}</td>
+          <td>${parseFloat(value).toFixed(6)}</td>
+        </tr>`
+      }
+      html_table += `</table>`
+      Swal.fire({
+        title: 'Query: {{ query }}',
+        icon: 'info',
+        html: html_table});
+    </script>
+  {% endif %}
+
+  <form action="/search" method="post">
+  <div class="selection">
+    <div class="wrapper">
+      <input type="radio" name="select" id="option-1" value="BM25" checked>
+      <input type="radio" name="select" id="option-2" value="DPR">
+        <label for="option-1" class="option option-1">
+          <div class="dot"></div>
+           <span>BM25</span>
+           </label>
+        <label for="option-2" class="option option-2">
+          <div class="dot"></div>
+           <span>DPR</span>
+        </label>
+     </div>    
+
+     <div class="wrapper">
+      <input type="radio" name="select-x" id="x-option-1" value="MiniLM" checked>
+      <input type="radio" name="select-x" id="x-option-2" value="RoBERTa">
+      <input type="radio" name="select-x" id="x-option-3" value="ALBERT">
+      <input type="radio" name="select-x" id="x-option-4" value="Flan-T5">
+        <label for="x-option-1" class="option x-option-1">
+          <div class="dot"></div>
+           <span>MiniLM</span>
+           </label>
+        <label for="x-option-2" class="option x-option-2">
+          <div class="dot"></div>
+           <span>RoBERTa</span>
+        </label>
+        <label for="x-option-3" class="option x-option-3">
+          <div class="dot"></div>
+           <span>ALBERT</span>
+           </label>
+        <label for="x-option-4" class="option x-option-4">
+          <div class="dot"></div>
+           <span>Flan-T5</span>
+        </label>
+     </div>    
+  </div>
+  <div class="search-box">
+    <button type="submit" class="btn-search"><i class="fas fa-search"></i></button>
+    <input type="text" name="query" class="input-search" placeholder="Type to Search..." />
+  </div>
+</form>
+
+</body>
+</html>
+
+
+
